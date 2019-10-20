@@ -1,2 +1,5 @@
-ntlk==3.4.4
+pyahocorasick==1.4.0
+names-dataset
+nltk==3.4.5
 numpy==1.17.2
+pyenchant==2.0.0
