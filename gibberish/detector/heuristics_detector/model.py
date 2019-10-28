@@ -1,6 +1,6 @@
 from gibberish.detector.abstract_model import AbstractGibberishDetector
 from gibberish.detector.utils import expand_contractions, delete_punctuation, filter_non_alphabetic_characters, \
-    get_words_iter, is_not_allowed_word, is_not_person_name, is_non_english_text
+    get_words_iter, is_not_abbreviation, is_not_interjection, is_not_person_name, is_non_english_text
 
 from .config import MIN_TEXT_LENGTH
 
@@ -16,7 +16,6 @@ class HeuristicsGibberishDetector(AbstractGibberishDetector):
         if len(text) < self._min_text_length or 'http' in text or 'data:image/jpeg' in text:
             return False
 
-        text = text.replace('’', '\'')
         text = expand_contractions(text)
 
         text = delete_punctuation(text)
@@ -24,7 +23,8 @@ class HeuristicsGibberishDetector(AbstractGibberishDetector):
         text = filter_non_alphabetic_characters(text)
 
         words_iter = get_words_iter(text)
-        words_iter = filter(is_not_allowed_word, words_iter)
+        words_iter = filter(is_not_abbreviation, words_iter)
+        words_iter = filter(is_not_interjection, words_iter)
         words = list(filter(is_not_person_name, words_iter))
 
         if len(words) == 0:

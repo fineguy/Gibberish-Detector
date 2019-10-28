@@ -7,7 +7,7 @@ import enchant
 from names_dataset import NameDataset
 from nltk.corpus import words as nltk_words
 
-from gibberish.config import ALLOWED_INTERJECTIONS_FILE_PATH, ALLOWED_WORDS_FILE_PATH, CONTRACTIONS_FILE_PATH
+from gibberish.config import ALLOWED_INTERJECTIONS_FILE_PATH, ALLOWED_ABBREVIATIONS_FILE_PATH, CONTRACTIONS_FILE_PATH
 from gibberish.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -26,7 +26,9 @@ _CONTRACTION_TO_FULL_FORM = {}
 with open(CONTRACTIONS_FILE_PATH, encoding='utf8') as fin:
     for line in fin:
         contraction, full_form = line.strip().split('\t')
+        # Make sure we consider capitalized contractions
         _CONTRACTION_TO_FULL_FORM[contraction.lower()] = full_form.lower()
+        _CONTRACTION_TO_FULL_FORM[contraction.capitalize()] = full_form.capitalize()
 _CONTRACTIONS_PATTERN = re.compile('({})'.format('|'.join(_CONTRACTION_TO_FULL_FORM.keys())))
 
 _ALLOWED_INTERJECTIONS_SET = set()
@@ -34,10 +36,10 @@ with open(ALLOWED_INTERJECTIONS_FILE_PATH, encoding='utf8') as fin:
     for line in fin:
         _ALLOWED_INTERJECTIONS_SET.add(frozenset(line.strip()))
 
-_ALLOWED_WORDS_SET = set()
-with open(ALLOWED_WORDS_FILE_PATH, encoding='utf8') as fin:
+_ALLOWED_ABBREVIATIONS_SET = set()
+with open(ALLOWED_ABBREVIATIONS_FILE_PATH, encoding='utf8') as fin:
     for line in fin:
-        _ALLOWED_WORDS_SET.add(line.strip())
+        _ALLOWED_ABBREVIATIONS_SET.add(line.strip())
 
 
 def _create_english_words_trie(min_word_len):
@@ -83,22 +85,28 @@ def expand_contractions(text):
     def replace(match):
         return _CONTRACTION_TO_FULL_FORM[match.group(0)]
 
+    text = text.replace('’', '\'')
+
     return _CONTRACTIONS_PATTERN.sub(replace, text)
 
 
 def filter_non_alphabetic_characters(text):
-    return ''.join(ch for ch in text.lower() if ch == ' ' or ch in string.ascii_lowercase)
+    return ''.join(ch for ch in text if ch == ' ' or ch in string.ascii_lowercase or ch in string.ascii_uppercase)
 
 
 def get_words_iter(text):
-    return filter(None, text.split(' '))
+    return (word for word in text.split() if not word.isspace())
 
 
-def is_not_allowed_word(word):
-    if word in _ALLOWED_WORDS_SET or delete_duplicate_characters(word) in _ALLOWED_WORDS_SET:
+def is_not_abbreviation(word):
+    if word in _ALLOWED_ABBREVIATIONS_SET or delete_duplicate_characters(word) in _ALLOWED_ABBREVIATIONS_SET:
         return False
 
-    unique_letters = sorted(set(word))
+    return True
+
+
+def is_not_interjection(word):
+    unique_letters = frozenset(word)
     if unique_letters in _ALLOWED_INTERJECTIONS_SET:
         return False
 
