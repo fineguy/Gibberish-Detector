@@ -8,7 +8,7 @@ from names_dataset import NameDataset
 from nltk.corpus import words as nltk_words
 
 from gibberish.config import ALLOWED_INTERJECTIONS_FILE_PATH, ALLOWED_WORDS_FILE_PATH, CONTRACTIONS_FILE_PATH
-from gibberish.utils import get_logger
+from gibberish.logger import get_logger
 
 _logger = get_logger(__name__)
 
