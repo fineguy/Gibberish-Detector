@@ -8,6 +8,9 @@ from names_dataset import NameDataset
 from nltk.corpus import words as nltk_words
 
 from gibberish.config import ALLOWED_INTERJECTIONS_FILE_PATH, ALLOWED_WORDS_FILE_PATH, CONTRACTIONS_FILE_PATH
+from gibberish.utils import get_logger
+
+_logger = get_logger(__name__)
 
 # English dictionaries
 _ENCHANT_DICT = enchant.Dict("en_US")
@@ -145,3 +148,22 @@ def is_non_english_text(words, max_non_english_words_ratio=0.5):
         return True
 
     return False
+
+
+def read_lines(file_path=None):
+    """
+    Reads lines from file (if provided) or console input (otherwise).
+
+    :param file_path:
+    :return:
+    """
+    if file_path:
+        _logger.info('Reading lines from file {}'.format(file_path))
+        with open(file_path, encoding='utf8') as fin:
+            yield from fin
+    else:
+        _logger.info('Reading lines from console input')
+        print('Please, write your input:\n')
+        while True:
+            line = input()
+            yield line

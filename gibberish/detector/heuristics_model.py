@@ -5,11 +5,14 @@ from gibberish.detector.utils import expand_contractions, delete_punctuation, fi
 
 
 class HeuristicsGibberishDetector(AbstractGibberishDetector):
+    def __init__(self, min_text_length=MIN_TEXT_LENGTH):
+        self._min_text_length = min_text_length
+
     def is_gibberish(self, text):
         text = text.strip()
 
         # Ignore text that includes links to files because they're hard to match
-        if len(text) < MIN_TEXT_LENGTH or 'http' in text or 'data:image/jpeg' in text:
+        if len(text) < self._min_text_length or 'http' in text or 'data:image/jpeg' in text:
             return False
 
         text = text.replace('’', '\'')
