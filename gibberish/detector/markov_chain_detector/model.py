@@ -1,6 +1,4 @@
 import pickle
-import re
-import string
 
 import numpy as np
 from nltk import ngrams
@@ -9,23 +7,20 @@ from gibberish.logger import get_logger
 from gibberish.detector.abstract_model import AbstractTrainableGibberishDetector
 from gibberish.detector.utils import read_lines
 
-_logger = get_logger(__name__)
+from .config import ACCEPTED_CHARS, CHAR_TO_IDX, ALLOWED_LINE_PATTERN
 
-_ACCEPTED_CHARS = string.ascii_lowercase + ' '
-_CHAR_TO_IDX = {char: idx for idx, char in enumerate(_ACCEPTED_CHARS)}
-_ALLOWED_LINE_PATTERN = re.compile('[^{}]'.format(_ACCEPTED_CHARS))
+_logger = get_logger(__name__)
 
 
 def _normalize(line):
     """
-    Returns only the subset of chars from `_ACCEPTED_CHARS`.
-    This helps keep the  model relatively small by ignoring punctuation,
-    infrequent symbols, etc.
+    Returns only the subset of chars from `ACCEPTED_CHARS`. This helps to keep the model relatively small by ignoring
+    punctuation, infrequent symbols, etc.
 
     :param line:
     :return:
     """
-    return _ALLOWED_LINE_PATTERN.sub('', line.lower())
+    return ALLOWED_LINE_PATTERN.sub('', line.lower())
 
 
 def _avg_transition_prob(normalized_line, log_probs_mat):
@@ -40,7 +35,7 @@ def _avg_transition_prob(normalized_line, log_probs_mat):
     transition_count = 0
 
     for transition_count, (char1, char2) in enumerate(ngrams(normalized_line, 2)):
-        log_prob += log_probs_mat[_CHAR_TO_IDX[char1]][_CHAR_TO_IDX[char2]]
+        log_prob += log_probs_mat[CHAR_TO_IDX[char1]][CHAR_TO_IDX[char2]]
 
     return np.exp(log_prob / max(transition_count, 1))
 
@@ -91,7 +86,7 @@ class MCMGibberishDetector(AbstractTrainableGibberishDetector):
 
         :return:
         """
-        num_chars = len(_ACCEPTED_CHARS)
+        num_chars = len(ACCEPTED_CHARS)
         # Assume we have seen 10 of each character pair.  This acts as a kind of
         # prior or smoothing factor.  This way, if we see a character transition
         # live that we've never observed in the past, we won't assume the entire
@@ -102,7 +97,7 @@ class MCMGibberishDetector(AbstractTrainableGibberishDetector):
         _logger.info('Calculating transition counts...')
         for line in _read_normalized_lines(data_path):
             for char1, char2 in ngrams(line, 2):
-                counts[_CHAR_TO_IDX[char1]][_CHAR_TO_IDX[char2]] += 1
+                counts[CHAR_TO_IDX[char1]][CHAR_TO_IDX[char2]] += 1
         _logger.info('Finished calculating transition counts.')
 
         # Normalize the counts so that they become log probabilities.

@@ -1,1 +1,2 @@
-from .heuristics_model import HeuristicsGibberishDetector
+from gibberish.detector.heuristics_detector.model import HeuristicsGibberishDetector
+from gibberish.detector.markov_chain_detector.model import MCMGibberishDetector

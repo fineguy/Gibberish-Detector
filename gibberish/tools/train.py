@@ -2,7 +2,7 @@ import argparse
 import os
 
 from gibberish.config import MODEL_FILE_PATH, DATA_DIR
-from gibberish.detector.markov_chain_model import MCMGibberishDetector
+from gibberish.detector import MCMGibberishDetector
 from gibberish.logger import get_logger
 
 _logger = get_logger(__name__)

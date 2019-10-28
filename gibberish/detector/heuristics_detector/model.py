@@ -1,7 +1,8 @@
 from gibberish.detector.abstract_model import AbstractGibberishDetector
-from gibberish.detector.config import MIN_TEXT_LENGTH
 from gibberish.detector.utils import expand_contractions, delete_punctuation, filter_non_alphabetic_characters, \
     get_words_iter, is_not_allowed_word, is_not_person_name, is_non_english_text
+
+from .config import MIN_TEXT_LENGTH
 
 
 class HeuristicsGibberishDetector(AbstractGibberishDetector):
