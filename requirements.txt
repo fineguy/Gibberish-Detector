@@ -3,8 +3,3 @@ nltk==3.4.5
 numpy==1.17.2
 pyahocorasick==1.4.0
 pyenchant==2.0.0
-
-# Install for tests
-coverage==4.5.4
-pytest==5.2.2
-pytest-cov==2.8.1
