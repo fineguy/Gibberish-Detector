@@ -38,4 +38,4 @@ install:
   - python -m nltk.downloader words
 
 script:
-  - pytest --cov==codecov
+  - pytest --cov==gibberish
