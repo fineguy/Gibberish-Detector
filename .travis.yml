@@ -30,8 +30,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ./venv/bin/activate; fi
   - python --version
   - pip install -U pip
-  - pip install -U pytest
-  - pip install codecov
+  - pip install -U pytest-cov
 
 install:
   - pip install -r requirements.txt
