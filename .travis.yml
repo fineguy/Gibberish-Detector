@@ -1,6 +1,13 @@
 sudo: false
 
 language: python
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/Library/Caches/Homebrew
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+  - brew cleanup
 
 matrix:
   include:
